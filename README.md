@@ -48,7 +48,7 @@ services:
 Gunakan command berikut untuk menjalankan container pada aplikasi Docker:
 
 ```bash
-docker-compose up -d
+docker-compose up --build
 ```
 
 ### Membuat Topik Kafka
@@ -78,13 +78,13 @@ kafka-topics.sh --list --bootstrap-server localhost:9092
 Masuk ke folder `kafka` dan gunakan command berikut untuk menjalankan producer:
 
 ```bash
-python3 kafka/kafka_producer.py
+python3 kafka_producer.py
 ```
 
 Buat terminal baru dan gunakan command berikut untuk menjalankan producer:
 
 ```bash
-python3 kafka/kafka_consumer.py
+python3 kafka_consumer.py
 ```
 
 Hasil output file batch akan muncul pada folder `batch` sesuai dengan jumlah data
@@ -113,7 +113,7 @@ Hasil output file batch akan muncul pada folder `batch` sesuai dengan jumlah dat
 
 3. Setiap model yang dilatih akan disimpan di folder `spark_ml/models/` dengan nama unik, misalnya `model_1`, `model_2`, dst., berdasarkan batch yang diproses.
 
-## Endpoint API
+## Setup dan Cara Mengakses API
 
 Untuk dapat melakukan request dan response dengan api, jalankan command berikut:
 
@@ -121,22 +121,36 @@ Untuk dapat melakukan request dan response dengan api, jalankan command berikut:
 python3 api/app.py
 ```
 
-Aplikasi tersebut akan berjalan pada `localhost:5000` dan endpoint yang dapat diakses adalah `/...` dengan format request sebagai berikut:
+Aplikasi tersebut akan berjalan pada `localhost:5000` dan endpoint yang dapat diakses yaitu `/predict-model/<model_id>`
 
-```JSON
-{
-    ...
-}
-```
+- `model_id` tersedia dari 1-3 (karena ada 3 model yang dilatih)
 
-Contoh request:
+- Contoh request menggunakan `curl`:
 
-```bash
-...
-```
+	```bash
+	curl -X POST http://localhost:5000/predict-model/3  \
+	-H "Content-Type: application/json"               \
+	-d '{
+			"person_age": 42,
+			"person_income": 60000,
+			"person_emp_exp": 12,
+			"loan_amnt": 4000,
+			"loan_int_rate": 0.10,
+			"loan_percent_income": 0.3,
+			"cb_person_cred_hist_length": 20,
+			"credit_score": 750,
+			"person_gender_index": 1,
+			"person_education_index": 2,
+			"person_home_ownership_index": 1,
+			"loan_intent_index": 1
+		}'
+	```
 
-Contoh response
+- Contoh response:
 
-```JSON
-...
-```
+	```JSON
+	{
+		"loan_status": 1,
+		"model": 3
+	}
+	```
