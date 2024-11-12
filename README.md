@@ -121,7 +121,11 @@ Untuk dapat melakukan request dan response dengan api, jalankan command berikut:
 python3 api/app.py
 ```
 
-Aplikasi tersebut akan berjalan pada `localhost:5000` dan endpoint yang dapat diakses yaitu `/predict-model/<model_id>`
+Aplikasi tersebut akan berjalan pada `localhost:5000` dan berikut adalah endpoint yang dapat diakses:
+
+### Endpoint `/predict-model/<model_id>`
+
+- Digunakan untuk memprediksi `loan_status` berdasarkan payload yang dikirim menggunakan `<model_id>` yang dipilih 
 
 - `model_id` tersedia dari 1-3 (karena ada 3 model yang dilatih)
 
@@ -154,3 +158,127 @@ Aplikasi tersebut akan berjalan pada `localhost:5000` dan endpoint yang dapat di
 		"model": 3
 	}
 	```
+
+### Endpoint `/history`
+
+- Digunakan untuk melihat riwayat payload serta hasil prediksi yang telah dilakukan sebelumnya
+
+- Contoh request menggunakan `curl`:
+
+```bash
+curl -X GET http://localhost:5000/history 
+```
+
+- Contoh response:
+
+```bash
+[
+  {
+    "input": {
+      "cb_person_cred_hist_length": 20,
+      "credit_score": 750,
+      "loan_amnt": 4000,
+      "loan_int_rate": 0.1,
+      "loan_intent_index": 1,
+      "loan_percent_income": 0.3,
+      "person_age": 42,
+      "person_education_index": 2,
+      "person_emp_exp": 12,
+      "person_gender_index": 1,
+      "person_home_ownership_index": 1,
+      "person_income": 60000
+    },
+    "model_id": "3",
+    "prediction": 0
+  }
+]
+```
+
+### Endpoint `/batch-predict/<model_id>`
+
+- Digunakan untuk memprediksi beberapa `loan_status` berdasarkan beberapa payload yang dikirim dalam bentuk array `[]` menggunakan `<model_id>` yang dipilih
+
+- `model_id` tersedia dari 1-3 (karena ada 3 model yang dilatih)
+
+- Contoh request menggunakan `curl`:
+
+```bash
+curl -X POST http://localhost:5000/batch-predict/1 \
+    -H "Content-Type: application/json" \
+    -d '{
+          "data": [
+              {
+                  "person_age": 25,
+                  "person_income": 30000,
+                  "person_emp_exp": 2,
+                  "loan_amnt": 2000,
+                  "loan_int_rate": 0.05,
+                  "loan_percent_income": 0.1,
+                  "cb_person_cred_hist_length": 10,
+                  "credit_score": 600,
+                  "person_gender_index": 1,
+                  "person_education_index": 1,
+                  "person_home_ownership_index": 1,
+                  "loan_intent_index": 1
+              },
+              {
+                  "person_age": 35,
+                  "person_income": 50000,
+                  "person_emp_exp": 7,
+                  "loan_amnt": 5000,
+                  "loan_int_rate": 0.2,
+                  "loan_percent_income": 0.2,
+                  "cb_person_cred_hist_length": 12,
+                  "credit_score": 650,
+                  "person_gender_index": 0,
+                  "person_education_index": 2,
+                  "person_home_ownership_index": 0,
+                  "loan_intent_index": 2
+              }
+          ]
+        }'
+```
+
+- Contoh response:
+
+```bash
+{
+  "model": "1",
+  "predictions": [
+    {
+      "input": {
+        "cb_person_cred_hist_length": 10,
+        "credit_score": 600,
+        "loan_amnt": 2000,
+        "loan_int_rate": 0.05,
+        "loan_intent_index": 1,
+        "loan_percent_income": 0.1,
+        "person_age": 25,
+        "person_education_index": 1,
+        "person_emp_exp": 2,
+        "person_gender_index": 1,
+        "person_home_ownership_index": 1,
+        "person_income": 30000,
+      },
+      "loan_status": 1
+    },
+    {
+      "input": {
+        "cb_person_cred_hist_length": 12,
+        "credit_score": 650,
+        "loan_amnt": 5000,
+        "loan_int_rate": 0.2,
+        "loan_intent_index": 2,
+        "loan_percent_income": 0.2,
+        "person_age": 35,
+        "person_education_index": 2,
+        "person_emp_exp": 7,
+        "person_gender_index": 0,
+        "person_home_ownership_index": 0,
+        "person_income": 50000
+      },
+      "loan_status": 0
+    }
+  ]
+}
+```
