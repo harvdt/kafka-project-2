@@ -19,7 +19,7 @@ header = 'person_age,person_gender,person_education,person_income,person_emp_exp
 
 for message in consumer:
     if counter == 0:
-        output = open(f'../Batch/batch{batch}.csv', 'w', encoding='utf-8')
+        output = open(f'../batch/batch{batch}.csv', 'w', encoding='utf-8')
         output.write(header)
 
     data = message.value

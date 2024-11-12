@@ -1,5 +1,7 @@
 # How to run it: pip install -r requirements.txt
 
-kafka-python
+kafka-python-ng
 pyspark
 numpy
+flask
+setuptools
